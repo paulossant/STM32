@@ -1,2 +1,2 @@
 # STM32
-Interrupt for UART
+Interrupt for UART using HAL libraries
