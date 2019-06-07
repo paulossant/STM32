@@ -40,7 +40,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include "RTC.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -67,12 +67,13 @@ TIM_HandleTypeDef htim6;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-
+unsigned char Data_buffer[50];
+uint16_t segundos, minutos, horas, dia, mes, ano;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-//static void MX_GPIO_Init(void);
+static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_TIM6_Init(void);
 /* USER CODE BEGIN PFP */
@@ -111,12 +112,17 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-//  MX_GPIO_Init();
+  MX_GPIO_Init();
   MX_USART2_UART_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   rtc_init();
-  rtc_w(0xff);
+//  rtc_write(0x82, 0x1f);	//minute
+//  rtc_write(0x84, 0x38); //hour
+//  rtc_write(0x86, 0x07);	//day
+//  rtc_write(0x88, 0x06); //month
+//  rtc_write(0x8c, 0x19);	//year
+  HAL_Delay(1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -126,13 +132,16 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//		GPIOA -> BSRR = 0x600; 			//PA9
-//		TIM6 -> CNT = 0u;
-//		while (TIM6 -> CNT < 150) {}
-//		GPIOA -> BRR = 0x600;			 //PA9
-//		TIM6 -> CNT = 0u;
-//		while (TIM6 -> CNT < 150) {}
-
+		segundos = rtc_sec();
+		minutos = rtc_min();
+		horas = rtc_hor();
+		dia = rtc_day();
+		mes = rtc_mon();
+		ano = rtc_yer();
+		sprintf(Data_buffer, "%02d/%02d/%02d \t\t %02d:%02d:%02d \n\r",ano, mes, dia, horas, minutos, segundos);
+	    HAL_UART_Transmit(&huart2, Data_buffer, sizeof Data_buffer, 10);
+		memset(Data_buffer, 0, 50);
+		HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
@@ -156,7 +165,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
   RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 32;
+  RCC_OscInitStruct.PLL.PLLN = 24;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -173,7 +182,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
@@ -209,9 +218,9 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 2;
+  htim6.Init.Prescaler = 1;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 256;
+  htim6.Init.Period = 255;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
@@ -269,13 +278,13 @@ static void MX_USART2_UART_Init(void)
   * @param None
   * @retval None
   */
-//static void MX_GPIO_Init(void)
-//{
-//
-//  /* GPIO Ports Clock Enable */
-//  __HAL_RCC_GPIOA_CLK_ENABLE();
-//
-//}
+static void MX_GPIO_Init(void)
+{
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+
+}
 
 /* USER CODE BEGIN 4 */
 
