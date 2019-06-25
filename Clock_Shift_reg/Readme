@@ -1,0 +1,16 @@
+Creation of a big 7segment display using an discrete LED's
+
+Connection to the Shift register outputs:
+
+     G  G  G
+  A           C
+  A           C
+  A           C
+     D  D  D
+  B           E
+  B           E
+  B           E
+     F  F F
+     
+     
+     Work in progress
