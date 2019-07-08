@@ -1,0 +1,5 @@
+Library for the 3.5" ILI9481 tft lcd controlled by a STM32.
+This library is made using the port registers directly.
+
+Is not yet in functional state.
+Work in progress..
