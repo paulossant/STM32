@@ -24,7 +24,6 @@
 #include <stdio.h>
 
 #include "glcdfont.h"
-#include "stm32f4xx_hal.h"
 
 #define TFTWIDTH   240
 #define TFTHEIGHT  320
@@ -41,6 +40,7 @@
 // GPIOB, GPIO_PIN_4  -> BIT 5
 // GPIOB, GPIO_PIN_10 -> BIT 6
 // GPIOA, GPIO_PIN_8  -> BIT 7
+
 
 #define LCD_CS_PIN  GPIO_PIN_0	// PB0 -> A3 // Chip Select goes to Analog 3
 #define LCD_CD_PIN  GPIO_PIN_4	// PA4 -> A2 // Command/Data goes to Analog 2
@@ -69,7 +69,7 @@
 #define LCD_RST_HIGH()    LCD_RST_GPIO_PORT->BSRR = LCD_RST_PIN
 #define LCD_RST_LOW()     LCD_RST_GPIO_PORT->BSRR = LCD_RST_PIN <<16
 
-#define LCD_WR_STROBE() { LCD_WR_LOW(); delay(1); LCD_WR_HIGH();}
+#define LCD_WR_STROBE() { LCD_WR_LOW(); delay(0); LCD_WR_HIGH();  delay(0);}	//If always stable remove delay
 
 #define swap(a, b) { int16_t t = a; a = b; b = t; }
 
@@ -98,17 +98,17 @@ static const uint16_t ST7781_regValues[] = {
 	0x0011,0x0005,
 	0x0012,0x0000,
 	0x0013,0x0000,
-	TFTLCD_DELAY, 0x001f,
+	TFTLCD_DELAY, 0x00ff,
 	//********POWER SUPPPLY STARTUP 1 SETTING*******//
 	0x0010,0x12B0,
-	TFTLCD_DELAY, 0x001f,
+	TFTLCD_DELAY, 0x00ff,
 	0x0011,0x0007,
-	TFTLCD_DELAY, 0x001f,
+	TFTLCD_DELAY, 0x00ff,
 	//********POWER SUPPLY STARTUP 2 SETTING******//
 	0x0012,0x008C,
 	0x0013,0x1700,
 	0x0029,0x0022,
-	TFTLCD_DELAY, 0x001f,
+	TFTLCD_DELAY, 0x00ff,
 	//******GAMMA CLUSTER SETTING******//
 	0x0030,0x0000,
 	0x0031,0x0505,
@@ -138,7 +138,6 @@ void delay(unsigned int t)
 	}
 }
 
-
 /**
  * \brief GPIO Initialization
  * 
@@ -146,14 +145,53 @@ void delay(unsigned int t)
  * 
  * \return void
  */
+void LCD_GPIO_Init(void)
+{
+  // GPIO to data bus pin connections
+  // ---- PORT Pin ---     --- Data ----
+  //GPIOA, GPIO_PIN_9  	-> 	BIT 0
+  //GPIOC, GPIO_PIN_7  	->	BIT 1
+  //GPIOA, GPIO_PIN_10 	-> 	BIT 2
+  //GPIOB, GPIO_PIN_3  	-> 	BIT 3
+  //GPIOB, GPIO_PIN_5  	-> 	BIT 4
+  //GPIOB, GPIO_PIN_4  	-> 	BIT 5
+  //GPIOB, GPIO_PIN_10 	-> 	BIT 6
+  //GPIOA, GPIO_PIN_8  	-> 	BIT 7
+  //GPIOB, GPIO_PIN_0	-> 	CS
+  //GPIOA, GPIO_PIN_4	-> 	CD
+  //GPIOA, GPIO_PIN_1	-> 	WR
+  //GPIOA, GPIO_PIN_0	-> 	RD
+  //GPIOC, GPIO_PIN_1	-> 	RST
+
+  	RCC -> AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+	GPIOA -> MODER |= (GPIO_MODER_MODE0_0 | GPIO_MODER_MODE1_0 | GPIO_MODER_MODE4_0 | GPIO_MODER_MODE8_0 | GPIO_MODER_MODE9_0 | GPIO_MODER_MODE10_0);
+	GPIOA -> MODER &= ~(GPIO_MODER_MODE0_1 | GPIO_MODER_MODE1_1 | GPIO_MODER_MODE4_1 | GPIO_MODER_MODE8_1 | GPIO_MODER_MODE9_1 | GPIO_MODER_MODE10_1);
+	GPIOA -> OTYPER &= ~(GPIO_OTYPER_OT0 | GPIO_OTYPER_OT1 | GPIO_OTYPER_OT4 | GPIO_OTYPER_OT8 | GPIO_OTYPER_OT9 | GPIO_OTYPER_OT10);
+	GPIOA -> OSPEEDR |= (GPIO_OSPEEDER_OSPEEDR0 | GPIO_OSPEEDER_OSPEEDR1 | GPIO_OSPEEDER_OSPEEDR4 | GPIO_OSPEEDER_OSPEEDR8 | GPIO_OSPEEDER_OSPEEDR9 | GPIO_OSPEEDER_OSPEEDR10 );
+	GPIOA -> ODR &= ~(GPIO_ODR_OD0 | GPIO_ODR_OD1 | GPIO_ODR_OD4 | GPIO_ODR_OD8 | GPIO_ODR_OD9 | GPIO_ODR_OD10 );
+
+  	RCC -> AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+	GPIOB -> MODER |= (GPIO_MODER_MODE0_0 | GPIO_MODER_MODE3_0 | GPIO_MODER_MODE4_0 | GPIO_MODER_MODE5_0 | GPIO_MODER_MODE10_0);
+	GPIOB -> MODER &= ~(GPIO_MODER_MODE0_1 | GPIO_MODER_MODE3_1 | GPIO_MODER_MODE4_1 | GPIO_MODER_MODE5_1 | GPIO_MODER_MODE10_1);
+	GPIOB -> OTYPER &= ~(GPIO_OTYPER_OT0 |GPIO_OTYPER_OT3 | GPIO_OTYPER_OT4 | GPIO_OTYPER_OT5 | GPIO_OTYPER_OT10);
+	GPIOB -> OSPEEDR |= (GPIO_OSPEEDER_OSPEEDR0 | GPIO_OSPEEDER_OSPEEDR3 | GPIO_OSPEEDER_OSPEEDR4 | GPIO_OSPEEDER_OSPEEDR5 | GPIO_OSPEEDER_OSPEEDR10 );
+	GPIOB -> ODR &= ~(GPIO_ODR_OD0 | GPIO_ODR_OD3 | GPIO_ODR_OD4 | GPIO_ODR_OD5 | GPIO_ODR_OD10 );
+
+  	RCC -> AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+	GPIOC -> MODER |= (GPIO_MODER_MODE1_0 | GPIO_MODER_MODE7_0);
+	GPIOC -> MODER &= ~(GPIO_MODER_MODE1_1 | GPIO_MODER_MODE7_1);
+	GPIOC -> OTYPER &= ~(GPIO_OTYPER_OT1 | GPIO_OTYPER_OT7);
+	GPIOC -> OSPEEDR |= (GPIO_OSPEEDER_OSPEEDR1 | GPIO_OSPEEDER_OSPEEDR7);
+	GPIOC -> ODR &= ~(GPIO_ODR_OD1 | GPIO_ODR_OD7);
+}
 
 /**
  * \brief LCD Initialization
- * 
- * \param 
- * 
+ *
+ * \param
+ *
  * \return void
- */
+*/
 void LCD_Begin(void)
 {
 	m_width     = TFTWIDTH;
@@ -168,6 +206,7 @@ void LCD_Begin(void)
 	uint8_t j = 0;
 	uint16_t a, d;
 
+	LCD_GPIO_Init();
 	LCD_Reset();
 	LCD_CS_LOW();
 
@@ -191,7 +230,7 @@ void LCD_Begin(void)
 	}
 
     LCD_SetRotation(m_rotation);
-	LCD_SetAddrWindow(TFTWIDTH-1, 0, 0, TFTHEIGHT-1);
+	LCD_SetAddrWindow(0, 0, TFTWIDTH-1, TFTHEIGHT-1);
 }
 
 /**

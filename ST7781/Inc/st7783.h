@@ -19,7 +19,7 @@
 #define WHITE   0xFFFF
 #define LIGHTGRAY 0xCDB6
 
-
+void LCD_GPIO_Init(void);
 void LCD_Begin(void);
 void LCD_DrawPixel(int16_t x, int16_t y, uint16_t color);
 void LCD_DrawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
