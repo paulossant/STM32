@@ -46,8 +46,9 @@
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-u_int64_t counter = 1000;
+u_int64_t counter = 100000;
 char *TxBuf = "Hello world";
+uint8_t i = 0 ;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -96,16 +97,18 @@ int main(void)
   /* USER CODE BEGIN 2 */
   LCD_Begin();
   delay(100);
-  LCD_fillScreen(RED);	      delay(counter);
-  LCD_fillScreen(GREEN);	  delay(counter);
-  LCD_fillScreen(BLUE);	      delay(counter);
-  LCD_fillScreen(MAGENTA);	  delay(counter);
-  LCD_fillScreen(YELLOW);	  delay(counter);
-  LCD_fillScreen(CYAN);	  	  delay(counter);
-  LCD_fillScreen(WHITE);	  delay(counter);
-  LCD_fillScreen(GRAY);	 	  delay(counter);
-  LCD_fillScreen(BLACK);	  delay(counter);
-
+  LCD_fillScreen(RED);	      HAL_Delay(200);
+  LCD_fillScreen(GREEN);	  HAL_Delay(200);
+  LCD_fillScreen(BLUE);	      HAL_Delay(200);
+  LCD_fillScreen(MAGENTA);	  HAL_Delay(1);
+  LCD_fillScreen(YELLOW);	  HAL_Delay(1);
+  LCD_fillScreen(CYAN);	  	  HAL_Delay(1);
+  LCD_fillScreen(WHITE);	  HAL_Delay(1);
+  LCD_fillScreen(GRAY);	 	  HAL_Delay(1);
+  LCD_fillScreen(BLACK);	  HAL_Delay(1);
+//	  LCD_fillRectangle(25, 100, 50, 200, RED); 		HAL_Delay(1000);
+//	  LCD_fillRectangle(50, 200, 100, 300, GREEN);   	HAL_Delay(1000);
+//	  LCD_fillRectangle(100, 300, 200, 400, BLUE);		HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -115,21 +118,34 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	  LCD_fillRectangle(25, 100, 50, 200, RED); 		HAL_Delay(1000);
-//	  LCD_fillRectangle(50, 200, 100, 300, GREEN);   	HAL_Delay(1000);
-//	  LCD_fillRectangle(100, 300, 200, 400, BLUE);		HAL_Delay(1000);
 //	  LCD_WriteChar(100, 100, (char)'P', Font_16x26, RED, BLUE);
 //	  HAL_Delay(1000);
-	  LCD_WriteString(10, 300, TxBuf, Font_11x18, GREEN, BLUE);
-	  LCD_WriteString(10, 200, TxBuf, Font_16x26, RED, BLACK);
-//	  HAL_Delay(1000);
+//	  LCD_WriteString(10, 300, TxBuf, Font_11x18, GREEN, BLUE);
+//	  HAL_Delay(500);
+
+//	  HAL_Delay(500);
+
 	  LCD_fillScreen(BLACK);
-//	  HAL_Delay(1000);
-//	  LCD_fillRectangle(20, 20, 300, 120, MAGENTA);		HAL_Delay(100);
-//	  LCD_fillRectangle(20, 140, 300, 240, YELLOW);		HAL_Delay(100);
-//	  LCD_fillRectangle(20, 260, 300, 360, CYAN);		HAL_Delay(100);
-//	  LCD_fillRectangle(20, 380, 300, 460, GRAY);		HAL_Delay(100);
-	  LCD_drawPixel (10,10, WHITE);				 		HAL_Delay(100);
+	  LCD_fillRectangle(10, 10, 230, 70, BLUE);
+	  LCD_fillRectangle(10, 90, 230, 150, BLUE);
+	  LCD_fillRectangle(10, 170, 230, 230, BLUE);
+	  LCD_fillRectangle(10, 250, 230, 310, BLUE);
+	  LCD_fillRectangle(250, 10, 470, 70, RED);
+	  LCD_fillRectangle(250, 90, 470, 150, RED);
+	  LCD_fillRectangle(250, 170, 470, 230, RED);
+	  LCD_fillRectangle(250, 250, 470, 310, RED);
+	  LCD_WriteString(50, 20, "Option 1", Font_16x26, WHITE, BLUE);
+	  LCD_WriteString(50, 120, "Option 2", Font_11x18, WHITE, BLUE);
+	  HAL_Delay(2000);
+//	  LCD_ONOFF(0);
+//	  HAL_Delay(10000);
+//	  LCD_ONOFF(1);
+//	  HAL_Delay(5);
+
+
+//	  LCD_drawPixel (10,10, WHITE);				 		HAL_Delay(100);
+////	  LCD_Invert(i);
+////	  (i == 1) ? (i = 0) : ( i = 1 );
   }
   /* USER CODE END 3 */
 }

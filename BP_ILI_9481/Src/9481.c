@@ -172,70 +172,72 @@ void LCD_Begin(void)
 	LCD_Reset();
 	delay(120);
 
-	LCD_WriteCMD(0x01);		//soft reset
+	LCD_WriteCMD(0x11);		// Exit sleep mode
 	LCD_CS_HIGH();
-	delay(1200);
+	delay(80);
 
-	LCD_WriteCMD(0xCB);     // POWER CONTROL A
-	LCD_Write8(0x39); 	LCD_Write8(0x39); 	LCD_Write8(0x2c); 	LCD_Write8(0x00); 	LCD_Write8(0x34);  	LCD_Write8(0x02);
-	LCD_CS_HIGH();
-
-
-	LCD_WriteCMD(0xeB);		// DRIVER TIMING CONTROL A
-	LCD_Write8(0x85); 	LCD_Write8(0x39);	LCD_Write8(0x00); 	LCD_Write8(0x78);
+	LCD_WriteCMD(0xD0);		// Power settings
+	LCD_Write8(0x07);
+	LCD_Write8(0x42);
+	LCD_Write8(0x18);
 	LCD_CS_HIGH();
 
-	LCD_WriteCMD(0xed);		// POWER ON SEQUENCE CONTROL
-	LCD_Write8(0x64); 	LCD_Write8(0x03); 	LCD_Write8(0x12); 	LCD_Write8(0x81);
+	LCD_WriteCMD(0xD1);		// VCOM control
+	LCD_Write8(0x00);
+	LCD_Write8(0x07);
+	LCD_Write8(0x10);
 	LCD_CS_HIGH();
 
-	LCD_WriteCMD(0xf7);		// PUMP RATIO CONTROL
-	LCD_Write8(0x20);
+	LCD_WriteCMD(0xD2);		// Power setting for normal mode
+	LCD_Write8(0x01);
+	LCD_Write8(0x02);
 	LCD_CS_HIGH();
 
-	LCD_WriteCMD(0xC5);		// VCM CONTROL
-	LCD_Write8(0x3e); 	LCD_Write8(0x28);
+	LCD_WriteCMD(0xc0);		// panel driving setting - 5 parameters
+	LCD_Write8(0x10);
+	LCD_Write8(0x3b);
+	LCD_Write8(0x00);
+	LCD_Write8(0x00);
+	LCD_Write8(0x02);
+	LCD_Write8(0x01);
 	LCD_CS_HIGH();
 
-	LCD_WriteCMD(0x36);		// MEMORY ACCESS CONTROL
-	LCD_Write8(0x40);
+	LCD_WriteCMD(0xc5);		// frame rate and inversion control - 1 parameter
+	LCD_Write8(0x00);
+	LCD_CS_HIGH();
+
+	LCD_WriteCMD(0xb3);		//frame memeory access and interface setting
+	LCD_Write8(0x00);
+	LCD_Write8(0x00);
+	LCD_Write8(0x00);
+	LCD_Write8(0x00);
+	LCD_CS_HIGH();
+
+	LCD_WriteCMD(0x34);		// Tear off
+	LCD_CS_HIGH();
+
+	LCD_WriteCMD(0xc1);		//display timing for normal mode
+	LCD_Write8(0x10);
+	LCD_Write8(0x10);
+	LCD_Write8(0x22);
+	LCD_CS_HIGH();
+
+	LCD_WriteCMD(0xc8);     // GAMMA CURVE CORRECTION POSITIVE
+	LCD_Write8(0x00);LCD_Write8(0x32);LCD_Write8(0x36);LCD_Write8(0x45);
+	LCD_Write8(0x06);LCD_Write8(0x16);LCD_Write8(0x37);LCD_Write8(0x75);
+	LCD_Write8(0x77);LCD_Write8(0x54);LCD_Write8(0x0c);LCD_Write8(0x00);
+	LCD_CS_HIGH();
+
+	LCD_WriteCMD(0x36);		// set address mode - 1 parameter
+	LCD_Write8(0xea);
+	LCD_CS_HIGH();
+
+	LCD_WriteCMD(0x13);		// enter normal mode - no param
 	LCD_CS_HIGH();
 
 	LCD_WriteCMD(0x3a);		// PIXEL FORMAT
 	LCD_Write8(0x55);
 	LCD_CS_HIGH();
-
-	LCD_WriteCMD(0xb1);		// FRAME RATIO CONTROL, STANDARD RGB COLOR
-	LCD_Write8(0x00); 	LCD_Write8(0x10);
-	LCD_CS_HIGH();
-
-	LCD_WriteCMD(0xb6); 	// DISPLAY FUNCTION CONTROL
-	LCD_Write8(0x08); 	LCD_Write8(0x82);  	LCD_Write8(0x27);
-	LCD_CS_HIGH();
-
-	LCD_WriteCMD(0xf2);     // 3GAMMA FUNCTION DISABLE
-	LCD_Write8(0x00);
-	LCD_CS_HIGH();
-
-	LCD_WriteCMD(0x26);     // GAMMA CURVE SELECTED
-	LCD_Write8(0x01);
-	LCD_CS_HIGH();
-
-	LCD_WriteCMD(0xE0);     // GAMMA CURVE CORRECTION POSITIVE
-	LCD_Write8(0x0F);LCD_Write8(0x31);LCD_Write8(0x2B);LCD_Write8(0x0C);LCD_Write8(0x0E);LCD_Write8(0x08);LCD_Write8(0x4E);
-	LCD_Write8(0xF1);LCD_Write8(0x37);LCD_Write8(0x07);LCD_Write8(0x10);LCD_Write8(0x03);LCD_Write8(0x0E);LCD_Write8(0x09);
-	LCD_Write8(0x00);
-	LCD_CS_HIGH();
-
-	LCD_WriteCMD(0xE1);     // GAMMA CURVE CORRECTION NEGATIVE
-	LCD_Write8(0x00);LCD_Write8(0x0E);LCD_Write8(0x14);LCD_Write8(0x03);LCD_Write8(0x11);LCD_Write8(0x07);LCD_Write8(0x31);
-	LCD_Write8(0xC1);LCD_Write8(0x48);LCD_Write8(0x08);LCD_Write8(0x0F);LCD_Write8(0x0C);LCD_Write8(0x31);LCD_Write8(0x36);
-	LCD_Write8(0x0F);
-	LCD_CS_HIGH();
-
-	LCD_WriteCMD(0x11);		// EXIT SLEEP
-	LCD_CS_HIGH();
-	delay(1000);
 
 	LCD_WriteCMD(0x29);		// TURN ON DISPLAY
 	LCD_CS_HIGH();
@@ -269,7 +271,7 @@ void LCD_setAddrWindow (int x0, int y0, int x1, int y1) {
 
 void LCD_fillScreen (uint16_t color)
 {
-  LCD_setAddrWindow (0,0,319,479);
+  LCD_setAddrWindow (0,0,Height-1, Width-1);
   LCD_WriteCMD(0x2c); //write memory start
   for(int i=0; i<Height; i++)
   {
@@ -334,4 +336,34 @@ void LCD_WriteString(uint16_t x, uint16_t y,  char *str, FontDef font, uint16_t 
         x += font.width;
         str++;
     }
+}
+
+void LCD_rotateScreen(uint8_t rotation){
+
+	LCD_WriteCMD(0x36);
+
+	if (rotation == 0){
+		LCD_WriteCMD(0x40);
+	}
+	else if (rotation == 1){
+		LCD_WriteCMD(0xc0);
+	}
+	else if (rotation == 2){
+		LCD_WriteCMD(0x60);
+	}
+	else if (rotation == 3){
+		LCD_WriteCMD(0xa0);
+	}
+
+	LCD_CS_HIGH();
+}
+
+void LCD_ONOFF(uint8_t state){
+	if (state == 0){
+		LCD_WriteCMD(0x28);
+	}
+	else if (state == 1){
+		LCD_WriteCMD(0x29);
+	}
+	LCD_CS_HIGH();
 }
