@@ -1,0 +1,3 @@
+Library for the HX8357-D LCD
+Includes graphics and touch, but still a barebone library.
+To include in the future the SD card SPI interface
